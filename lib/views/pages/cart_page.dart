@@ -17,8 +17,14 @@ class CartPage extends GetView<CartController> {
       ),
       body: Obx(() {
         if (controller.cartItems.isEmpty) {
-          return const Center(child: Text("Keranjang masih kosong"));
+          return const Center(
+            child: Text(
+              "Keranjang masih kosong",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
         }
+
         return ListView.builder(
           itemCount: controller.cartItems.length,
           itemBuilder: (context, index) {
@@ -32,16 +38,33 @@ class CartPage extends GetView<CartController> {
                 onPressed: () {
                   Get.defaultDialog(
                     title: "Hapus Item",
-                    middleText: "Yakin ingin menghapus ${product.title}?",
+                    middleText: "Yakin ingin menghapus ${product.title} dari keranjang?",
                     textConfirm: "Ya, Hapus",
                     textCancel: "Batal",
                     confirmTextColor: Colors.white,
                     buttonColor: Colors.red,
                     onConfirm: () {
-                      controller.removeFromCart(product);
+                      String productName = product.title ?? 'Produk';
+                      
+                      // 1. TUTUP DIALOG DULU (Penting!)
                       if (Get.isDialogOpen!) {
                         Get.back();
                       }
+
+                      // 2. Hapus item dari controller
+                      controller.removeFromCart(product);
+
+                      // 3. BARU MUNCULKAN SNACKBAR
+                      Get.snackbar(
+                        "Dihapus",
+                        "$productName telah dihapus dari keranjang",
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red[50],
+                        colorText: Colors.red[900],
+                        icon: const Icon(Icons.delete_sweep, color: Colors.red),
+                        margin: const EdgeInsets.all(10),
+                        duration: const Duration(seconds: 2),
+                      );
                     },
                   );
                 },
